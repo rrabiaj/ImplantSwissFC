@@ -8,7 +8,12 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import Players from './pages/Players';
 import PlayerNew from './pages/PlayerNew';
+import PlayerDetail from './pages/PlayerDetail';
+import PlayerEdit from './pages/PlayerEdit';
 import Matches from './pages/Matches';
+import MatchNew from './pages/MatchNew';
+import MatchDetail from './pages/MatchDetail';
+import MatchEdit from './pages/MatchEdit';
 
 export default function App() {
   return (
@@ -31,6 +36,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Player routes */}
           <Route
             path="/players"
             element={
@@ -56,11 +63,23 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Players />
+                  <PlayerDetail />
                 </AppLayout>
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/players/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <PlayerEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Match routes */}
           <Route
             path="/matches"
             element={
@@ -76,7 +95,7 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Matches />
+                  <MatchNew />
                 </AppLayout>
               </ProtectedRoute>
             }
@@ -86,7 +105,17 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Matches />
+                  <MatchDetail />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/matches/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <MatchEdit />
                 </AppLayout>
               </ProtectedRoute>
             }

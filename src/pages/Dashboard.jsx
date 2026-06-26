@@ -7,17 +7,20 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [players, setPlayers] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [allGoals, setAllGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [playersRes, matchesRes] = await Promise.all([
+        const [playersRes, matchesRes, goalsRes] = await Promise.all([
           api.get('/players').catch(() => ({ data: [] })),
           api.get('/matches').catch(() => ({ data: [] })),
+          api.get('/goals').catch(() => ({ data: [] })),
         ]);
         setPlayers(playersRes.data || []);
         setMatches(matchesRes.data || []);
+        setAllGoals(goalsRes.data || []);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -193,6 +196,54 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Top Scorers */}
+      <div className="bg-[#1a1a2e] border border-gray-800 rounded-xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">🎯 Top Scorers</h2>
+        {loading ? (
+          <div className="animate-pulse space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-800 rounded-lg"></div>
+            ))}
+          </div>
+        ) : allGoals.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No goals scored yet</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {(() => {
+              // Count goals per scorer
+              const scorerCounts = {};
+              allGoals.forEach((g) => {
+                const name = g.goalScorer || `Player #${g.playerId}`;
+                scorerCounts[name] = (scorerCounts[name] || 0) + 1;
+              });
+              // Sort by count descending, take top 5
+              const topScorers = Object.entries(scorerCounts)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5);
+
+              return topScorers.map(([name, count], idx) => (
+                <div key={name} className="flex items-center justify-between p-3 bg-[#111111] rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                      idx === 0 ? 'bg-yellow-600 text-white' :
+                      idx === 1 ? 'bg-gray-400 text-gray-900' :
+                      idx === 2 ? 'bg-amber-700 text-white' :
+                      'bg-gray-700 text-gray-300'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <span className="text-white font-medium">{name}</span>
+                  </div>
+                  <span className="text-primary font-bold text-lg">{count}</span>
+                </div>
+              ));
+            })()}
+          </div>
+        )}
       </div>
     </div>
   );
